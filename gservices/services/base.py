@@ -34,7 +34,13 @@ class BaseService(object):
             self.credentials = settings.DELEGATED_CREDENTIALS
 
         if data:
-            self._data = data
+            self._data = self._parse_data(data)
+
+    def _parse_data(self, data):
+        if type(data) is dict
+            return data
+        elif type(data) is basestring
+            return json.loads(data)
 
     @property
     def request_http(self):

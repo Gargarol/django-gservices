@@ -22,7 +22,6 @@ class BaseGoogleServiceField(JSONField):
         if value is None:
             return value
 
-        v = json.loads(value)
         return self.service_object(data=value)
 
     def get_prep_value(self, value):
