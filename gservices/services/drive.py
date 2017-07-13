@@ -32,6 +32,10 @@ class TeamDrive(BaseDrive):
     _update_exception_message = 'You must first create a team drive.'
     _delete_exception_message = 'You must first create a team drive.'
 
+    @property
+    def url(self):
+        return 'https://drive.google.com/drive/u/1/folders/{0}'.format(self._data['id'])
+
     def _create_payload(self, name):
         return {'requestId': uuid.uuid4(),
                 'body': {'name': name}}
