@@ -39,9 +39,7 @@ class BaseService(object):
     def _parse_data(self, data):
         if type(data) is dict:
             return data
-        elif type(data) is basestring:
-            return json.loads(data)
-        elif type(data) is str:
+        elif isinstance(data, basestring):
             return json.loads(data)
 
     @property
