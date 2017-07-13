@@ -26,7 +26,10 @@ class BaseGoogleServiceField(JSONField):
         return self.service_object(data=value)
 
     def get_prep_value(self, value):
-        return value.json()
+        if value is None:
+            return value
+        else:
+            return value.json()
 
 
 class GoogleGroupField(BaseGoogleServiceField):
