@@ -41,6 +41,8 @@ class BaseService(object):
             return data
         elif type(data) is basestring:
             return json.loads(data)
+        elif type(data) is str:
+            return json.loads(data)
 
     @property
     def request_http(self):
