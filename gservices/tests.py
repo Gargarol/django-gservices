@@ -4,11 +4,26 @@ from __future__ import unicode_literals
 import datetime
 from time import sleep
 
+from django import forms
 from django.test import TestCase
+from django.urls import reverse
 from pytz import timezone
+from gservices.models import TestFileUploadModel
 
 from gservices.services import drive, calendar, admin
 import unittest
+
+
+class File(TestCase):
+
+    def test_upload_file(self):
+        url = reverse('test-file-form')
+        with open('test.txt') as f:
+            response = self.client.post(url, data={'test_file': f})
+            files = TestFileUploadModel.objects.all()
+            for file in files:
+                file.test_file.delete()
+            self.assertEqual(len(files), 1)
 
 
 class TeamDrive(unittest.TestCase):
@@ -134,14 +149,14 @@ class Events(unittest.TestCase):
         event = calendar.Event()
         start_time = datetime.datetime.now()
         time_zone = 'America/Phoenix'
-        end_time = datetime.datetime.now(tz=timezone(time_zone)) + datetime.timedelta(days=1)
-        updated_end_time = datetime.datetime.now(tz=timezone(time_zone)) + datetime.timedelta(days=2)
+        end_time = datetime.datetime.now() + datetime.timedelta(days=1)
+        updated_end_time = datetime.datetime.now() + datetime.timedelta(days=2)
         event.create(calendar_id=self.calendar.calendar_id,
                      start_time={'dateTime': start_time.isoformat(), 'timeZone': time_zone},
                      end_time={'dateTime': end_time.isoformat(), 'timeZone': time_zone})
         event.update(calendar_id=self.calendar.calendar_id,
                      end_time={'dateTime': updated_end_time.isoformat(), 'timeZone': time_zone})
-        self.assertEqual(event.end_time.strftime('%D'), updated_end_time.strftime('%D'))
+        self.assertEqual(event.end_time.strftime('%D'), updated_end_time.astimezone(timezone(time_zone)).strftime('%D'))
         event.delete(calendar_id=self.calendar.calendar_id)
 
     def test_delete_event(self):

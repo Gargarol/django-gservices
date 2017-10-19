@@ -1,5 +1,7 @@
 import uuid
 
+from googleapiclient.http import MediaFileUpload, MediaInMemoryUpload, MediaIoBaseUpload
+
 from gservices.services.base import BaseService
 from django.conf import settings
 
@@ -75,6 +77,29 @@ class BaseFile(BaseDrive):
     def team_drive_id(self):
         return self._get_property('teamDriveId')
 
+    @property
+    def web_view_link(self):
+        return self._get_property('webViewLink')
+
+
+class File(BaseFile):
+    def _create_payload(self, in_memory_file, parents, *args, **kwargs):
+        file_metadata = {'name': in_memory_file.name,
+                         'parents': parents}
+        media = MediaIoBaseUpload(in_memory_file,
+                                  mimetype=in_memory_file.content_type)
+
+        return {'body': file_metadata,
+                'supportsTeamDrives': True,
+                'media_body': media}
+
+    def _update_payload(self, *args, **kwargs):
+        pass
+
+    def _delete_payload(self, **kwargs):
+        return {'supportsTeamDrives': True,
+                'fileId': self.drive_id}
+
 
 class Folder(ListMixin, BaseFile):
     _GOOGLE_DRIVE_FOLDER_MIMETYPE = "application/vnd.google-apps.folder"
@@ -118,7 +143,6 @@ class Folder(ListMixin, BaseFile):
              'pageToken': page_token}
 
         if self.team_drive_id:
-
             d['teamDriveId'] = self.team_drive_id
             d['supportsTeamDrives'] = True
             d['includeTeamDriveItems'] = True
